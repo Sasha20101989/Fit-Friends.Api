@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34526.213
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitFriends.Api", "FitFriends.Api\FitFriends.Api.csproj", "{F6D522AF-77A1-4133-9EC9-29F5C0C2BEAB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C3B3301F-DA3A-4AE8-90DF-A876C99E49E1} = {C3B3301F-DA3A-4AE8-90DF-A876C99E49E1}
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{B22F2C67-49D5-4B1C-B6C8-323BB82A5854}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitFriends.ServiceLibrary", "FitFriends.ServiceLibrary\FitFriends.ServiceLibrary.csproj", "{C3B3301F-DA3A-4AE8-90DF-A876C99E49E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6D522AF-77A1-4133-9EC9-29F5C0C2BEAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6D522AF-77A1-4133-9EC9-29F5C0C2BEAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6D522AF-77A1-4133-9EC9-29F5C0C2BEAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6D522AF-77A1-4133-9EC9-29F5C0C2BEAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B22F2C67-49D5-4B1C-B6C8-323BB82A5854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B22F2C67-49D5-4B1C-B6C8-323BB82A5854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B22F2C67-49D5-4B1C-B6C8-323BB82A5854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B22F2C67-49D5-4B1C-B6C8-323BB82A5854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3B3301F-DA3A-4AE8-90DF-A876C99E49E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3B3301F-DA3A-4AE8-90DF-A876C99E49E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3B3301F-DA3A-4AE8-90DF-A876C99E49E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3B3301F-DA3A-4AE8-90DF-A876C99E49E1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {66A68501-1A4D-4C67-A74E-03027036297B}
+	EndGlobalSection
+EndGlobal

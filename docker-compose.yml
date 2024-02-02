@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  fitfriends.api:
+    image: ${DOCKER_REGISTRY-}fitfriends.api
+    container_name: fitfriends.api
+    build:
+      context: .
+      dockerfile: FitFriends.Api/Dockerfile
+    ports:
+      - 4444:8081
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:4444:8081;
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    container_name: fit-friends.sqlserver  
+    restart: "unless-stopped"
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment: 
+      SA_PASSWORD: "P@ssword123"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - "./data-mssql:/var/opt/mssql/data"
+    ports:
+      - 5050:1433
