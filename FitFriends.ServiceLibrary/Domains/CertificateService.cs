@@ -8,9 +8,13 @@ namespace FitFriends.ServiceLibrary.Domains
     {
         private readonly ICertificateRepository _certificateRepository;
 
-        public CertificateService(ICertificateRepository certificateRepository)
+        private readonly IImageService _imageService;
+
+        public CertificateService(ICertificateRepository certificateRepository, IImageService imageService)
         {
             _certificateRepository = certificateRepository;
+
+            _imageService = imageService;
         }
 
         public async Task DeleteAsync(Guid certificateId)
@@ -23,9 +27,19 @@ namespace FitFriends.ServiceLibrary.Domains
             return await _certificateRepository.GetAllByUserAsync(userId);
         }
 
-        public async Task<CertificateEntity> GetByIdAsync(Guid certificateId)
+        public async Task<CertificateEntity?> GetByIdAsync(Guid certificateId)
         {
-            return await _certificateRepository.GetByIdAsync(certificateId);
+            CertificateEntity certificateEntity = await _certificateRepository.GetByIdAsync(certificateId);
+
+            if (certificateEntity is not null)
+            {
+                if (certificateEntity.ImageId is not null)
+                {
+                    certificateEntity.Image = await _imageService.GetByIdAsync((Guid)certificateEntity.ImageId);
+                }
+            }
+
+            return certificateEntity;
         }
 
         public async Task InsertAsync(CertificateEntity entity)
@@ -33,9 +47,31 @@ namespace FitFriends.ServiceLibrary.Domains
             await _certificateRepository.InsertAsync(entity);
         }
 
-        public async Task<CertificateEntity> UpdateAsync(CertificateEntity entity)
+        public async Task<CertificateEntity?> UpdateAsync(CertificateEntity entity)
         {
-            return await _certificateRepository.UpdateAsync(entity);
+            Guid? oldImageId = entity.ImageId;
+
+            await _imageService.CreateAsync(entity.Image);
+
+            ImageEntity imageEntity = await _imageService.GetByIdAsync(entity.Image.Id);
+
+            if (imageEntity is not null)
+            {
+                entity.ImageId = imageEntity.Id;
+
+                CertificateEntity updatedCertificate = await _certificateRepository.UpdateAsync(entity);
+
+                if (oldImageId is not null)
+                {
+                    await _imageService.RemoveAsync((Guid)oldImageId);
+                }
+
+                return updatedCertificate;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

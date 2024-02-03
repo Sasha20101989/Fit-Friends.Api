@@ -40,6 +40,8 @@ namespace FitFriends.ServiceLibrary.Domains
 
         public async Task InsertAsync(UserEntity userEntity)
         {
+            userEntity.UserId = Guid.NewGuid();
+
             await _userRepository.InsertAsync(userEntity);
         }
 

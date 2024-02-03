@@ -15,6 +15,8 @@ namespace FitFriends.Api.HostBuilders.Domains
 
             services.AddScoped<IMoyskladService, MoyskladService>();
 
+            services.AddScoped<IImageService, ImageService>();
+
             return services;
         }
     }

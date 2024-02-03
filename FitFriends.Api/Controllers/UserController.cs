@@ -17,8 +17,6 @@ namespace FitFriends.Api.Controllers
             [FromBody]UserEntity user,
             [FromServices] IUserService userService) 
         {
-            user.UserId = Guid.NewGuid();
-
             await userService.InsertAsync(user);
 
             return  Ok(user);

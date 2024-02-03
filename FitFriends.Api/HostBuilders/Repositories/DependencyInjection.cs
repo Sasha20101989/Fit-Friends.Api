@@ -11,6 +11,8 @@ namespace FitFriends.Api.HostBuilders.Repositories
 
             services.AddScoped<ICertificateRepository, CertificateRepository>();
 
+            services.AddScoped<IImageRepository, ImageRepository>();
+
             return services;
         }
     }

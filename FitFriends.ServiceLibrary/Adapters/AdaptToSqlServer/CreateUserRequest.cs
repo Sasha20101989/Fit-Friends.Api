@@ -29,7 +29,7 @@ namespace FitFriends.ServiceLibrary.Adapters.AdaptToSqlServer
 
         public string Email { get; set; }
 
-        public string? Avatar { get; set; }
+        public ImageEntity? Avatar { get; set; }
 
         public string Password { get; set; }
 
@@ -43,7 +43,7 @@ namespace FitFriends.ServiceLibrary.Adapters.AdaptToSqlServer
 
         public string Station { get; set; }
 
-        public string ImageForPage { get; set; }
+        public ImageEntity ImageForPage { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

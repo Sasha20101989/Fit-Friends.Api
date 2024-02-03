@@ -8,16 +8,16 @@ namespace FitFriends.ServiceLibrary.Adapters.AdaptToSqlServer
         {
             CertificateId = entity.CertificateId;
             UserId = entity.UserId;
+            ImageId = entity.ImageId;
             CertificateName = entity.CertificateName;
-            Image = entity.Image;
         }
 
         public Guid CertificateId { get; set; }
 
         public Guid UserId { get; set; }
 
-        public string CertificateName { get; set; }
+        public Guid? ImageId { get; set; }
 
-        public string? Image { get; set; }
+        public string CertificateName { get; set; }
     }
 }

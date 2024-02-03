@@ -34,8 +34,7 @@ namespace FitFriends.ServiceLibrary.Entities
         /// <summary>
         /// Аватар пользователя.
         /// </summary>
-        [ImageValidation(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "InvalidImageErrorMessage")]
-        public string? Avatar { get; set; }
+        public ImageEntity? Avatar { get; set; }
 
         /// <summary>
         /// Пароль пользователя.
@@ -77,7 +76,7 @@ namespace FitFriends.ServiceLibrary.Entities
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
         [ImageValidation(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "InvalidImageErrorMessage")]
-        public string ImageForPage { get; set; }
+        public ImageEntity ImageForPage { get; set; }
 
         /// <summary>
         /// Дата создания пользователя.

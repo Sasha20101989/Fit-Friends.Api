@@ -1,6 +1,7 @@
 ﻿using FitFriends.ServiceLibrary.Attributes;
 using FitFriends.ServiceLibrary.Properties;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FitFriends.ServiceLibrary.Entities
 {
@@ -21,16 +22,19 @@ namespace FitFriends.ServiceLibrary.Entities
         public Guid UserId { get; set; }
 
         /// <summary>
+        /// Уникальный идентификатор изображения.
+        /// </summary>
+        public Guid? ImageId { get; set; }
+
+        /// <summary>
         /// Название сертификата.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
-        [ImageValidation(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "InvalidImageErrorMessage")]
         public string CertificateName { get; set; }
 
         /// <summary>
         /// Изображение сертификата.
         /// </summary>
-        public string? Image { get; set; }
+        public virtual ImageEntity? Image { get; set; }
     }
-
 }

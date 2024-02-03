@@ -4,5 +4,6 @@
     {
         public ConnectionStringsConfig ConnectionStrings { get; set; } = null!;
         public MoySkladConfig MoySklad { get; set; } = null!;
+        public FileSettings FileSettings { get; set; } = null!;
     }
 }

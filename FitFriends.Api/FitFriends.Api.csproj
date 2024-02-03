@@ -22,11 +22,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="wwwroot\" />
+	  <ProjectReference Include="..\FitFriends.ServiceLibrary\FitFriends.ServiceLibrary.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\FitFriends.ServiceLibrary\FitFriends.ServiceLibrary.csproj" />
+	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>

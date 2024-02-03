@@ -50,7 +50,7 @@ namespace FitFriends.ServiceLibrary.Repositories
                new { CertificateId = certificateId }
             );
 
-            return result.First();
+            return result.FirstOrDefault();
         }
 
         /// <inheritdoc />

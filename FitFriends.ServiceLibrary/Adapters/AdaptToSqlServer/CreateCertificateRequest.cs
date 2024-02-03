@@ -9,7 +9,6 @@ namespace FitFriends.ServiceLibrary.Adapters.AdaptToSqlServer
             CertificateId = entity.CertificateId;
             UserId = entity.UserId;
             CertificateName = entity.CertificateName;
-            Image = entity.Image;
         }
 
         public Guid CertificateId { get; set; }
@@ -17,7 +16,5 @@ namespace FitFriends.ServiceLibrary.Adapters.AdaptToSqlServer
         public Guid UserId { get; set; }
 
         public string CertificateName { get; set; }
-
-        public string? Image { get; set; }
     }
 }

@@ -10,7 +10,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FitFriends.Api/FitFriends.Api.csproj", "FitFriends.Api/"]
 WORKDIR "/src/FitFriends.Api"
-COPY ["wwwroot", "/app/wwwroot"]
+COPY ["wwwroot", "app/wwwroot"]
 RUN dotnet restore "./FitFriends.Api/FitFriends.Api.csproj"
 COPY . .
 WORKDIR "/src/FitFriends.Api"
