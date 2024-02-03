@@ -1,4 +1,5 @@
 ﻿using FitFriends.ServiceLibrary.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace FitFriends.ServiceLibrary.Domains.Contracts
 {
@@ -9,6 +10,13 @@ namespace FitFriends.ServiceLibrary.Domains.Contracts
         Task<ImageEntity> GetByIdAsync(Guid imageId);
 
         Task<ImageEntity?> UpdateImageAsync(ImageEntity entity);
+
+        Task<ImageEntity> UploadImageAsync(
+            Guid id,
+            IFormFile imageFile,
+            string subDirName,
+            string wwwrootPath,
+        Func<Guid, ImageEntity, string, Task> updateOperation);
 
         Task RemoveImageFromDbAsync(Guid? imageId);
 

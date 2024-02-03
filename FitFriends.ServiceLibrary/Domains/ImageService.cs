@@ -1,6 +1,7 @@
 ﻿using FitFriends.ServiceLibrary.Domains.Contracts;
 using FitFriends.ServiceLibrary.Entities;
 using FitFriends.ServiceLibrary.Repositories.Contracts;
+using Microsoft.AspNetCore.Http;
 
 namespace FitFriends.ServiceLibrary.Domains
 {
@@ -68,6 +69,46 @@ namespace FitFriends.ServiceLibrary.Domains
             {
                 await RemoveAsync((Guid)imageId);
             }
+        }
+
+        public async Task<ImageEntity> UploadImageAsync(
+            Guid id,
+            IFormFile imageFile,
+            string subDirName,
+            string wwwrootPath,
+            Func<Guid, ImageEntity, string, Task> updateOperation)
+        {
+            string subDirPath = $"{nameof(ImageEntity)}{id}";
+
+            DirectoryInfo directoryInfo = new(Path.Combine(wwwrootPath, subDirName));
+
+            if (!directoryInfo.Exists)
+            {
+                directoryInfo.Create();
+            }
+
+            directoryInfo.CreateSubdirectory(subDirPath);
+
+            string fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
+            string extension = Path.GetExtension(imageFile.FileName);
+            string imageTitle = $"{fileName}{id}{extension}";
+
+            string path = Path.Combine(wwwrootPath, subDirName, subDirPath, imageTitle);
+
+            using (FileStream fileStream = new(path, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            ImageEntity imageEntity = new()
+            {
+                ImageFile = imageFile,
+                ImageTitle = imageTitle
+            };
+
+            await updateOperation(id, imageEntity, wwwrootPath);
+
+            return imageEntity;
         }
 
         private void DeleteDirectory(string directoryPath)

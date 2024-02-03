@@ -13,13 +13,13 @@ namespace FitFriends.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IWebHostEnvironment _env;
-
         private readonly IImageService _imageService;
+
+        private readonly string _wwwrootPath;
 
         public UserController(IWebHostEnvironment env, IImageService imageService)
         {
-            _env = env;
+            _wwwrootPath = env.WebRootPath;
 
             _imageService = imageService;
         }
@@ -42,7 +42,7 @@ namespace FitFriends.Api.Controllers
             [FromRoute]Guid userId,
             [FromServices] IUserService userService)
         {
-            UserEntity user = await userService.GetByIdAsync(userId);
+            UserEntity? user = await userService.GetByIdAsync(userId);
 
             if (user is null)
             {
@@ -74,6 +74,11 @@ namespace FitFriends.Api.Controllers
         {
             UserEntity? result = await userService.UpdateUserAsync(user);
 
+            if (result is null)
+            {
+                return Problem();
+            }
+
             return Ok(result);
         }
 
@@ -92,19 +97,17 @@ namespace FitFriends.Api.Controllers
                 return NotFound("User not found");
             }
 
-            string wwwrootPath = _env.WebRootPath;
-
             await _imageService.RemoveImageAndDirectoryAsync(
                 "Avatars", 
                 user.AvatarId, 
-                user.UserId, 
-                wwwrootPath);
+                user.UserId,
+                _wwwrootPath);
 
             await _imageService.RemoveImageAndDirectoryAsync(
                 "PageImages", 
                 user.PageImageId, 
-                user.UserId, 
-                wwwrootPath);
+                user.UserId,
+                _wwwrootPath);
 
             await userService.DeleteAsync(userId);
 
@@ -167,11 +170,24 @@ namespace FitFriends.Api.Controllers
                 return NotFound("User not found");
             }
 
-            return await UploadImageAsync(
+            if (avatarFile is null)
+            {
+                return BadRequest($"The {nameof(ImageEntity)} file field is required.");
+            }
+
+            ImageEntity imageEntity = await _imageService.UploadImageAsync(
                 userId, 
                 avatarFile, 
                 "Avatars",
+                _wwwrootPath,
                 userService.UpdateUserWithNewAvatarAsync);
+
+            if (imageEntity is null)
+            {
+                return Problem();
+            }
+
+            return Ok(imageEntity);
         }
 
         [HttpPost("{userId}/pageImage")]
@@ -187,54 +203,22 @@ namespace FitFriends.Api.Controllers
                 return NotFound("User not found");
             }
 
-            return await UploadImageAsync(
-                userId, 
-                pageImageFile, 
-                "PageImages",
-                userService.UpdateUserWithNewPageImageAsync);
-        }
-
-        private async Task<IActionResult> UploadImageAsync(
-            Guid id,
-            IFormFile imageFile,
-            string subDirName,
-            Func<Guid, ImageEntity, string, Task> updateOperation)
-        {
-            if (imageFile is null)
+            if (pageImageFile is null)
             {
                 return BadRequest($"The {nameof(ImageEntity)} file field is required.");
             }
 
-            string wwwrootPath = _env.WebRootPath;
-            string subDirPath = $"{nameof(ImageEntity)}{id}";
+            ImageEntity imageEntity = await _imageService.UploadImageAsync(
+                userId,
+                pageImageFile,
+                "PageImages",
+                _wwwrootPath,
+                userService.UpdateUserWithNewPageImageAsync);
 
-            DirectoryInfo directoryInfo = new(Path.Combine(wwwrootPath, subDirName));
-
-            if (!directoryInfo.Exists)
+            if(imageEntity is null)
             {
-                directoryInfo.Create();
+                return Problem();
             }
-
-            directoryInfo.CreateSubdirectory(subDirPath);
-
-            string fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-            string extension = Path.GetExtension(imageFile.FileName);
-            string imageTitle = $"{fileName}{id}{extension}";
-
-            string path = Path.Combine(wwwrootPath, subDirName, subDirPath, imageTitle);
-
-            using (FileStream fileStream = new(path, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
-
-            ImageEntity imageEntity = new()
-            {
-                ImageFile = imageFile,
-                ImageTitle = imageTitle
-            };
-
-            await updateOperation(id, imageEntity, wwwrootPath);
 
             return Ok(imageEntity);
         }

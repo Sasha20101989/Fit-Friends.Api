@@ -9,10 +9,15 @@ namespace FitFriends.Api.Controllers
     [ApiController]
     public class CertificateController : ControllerBase
     {
-        private readonly IWebHostEnvironment _env;
-        public CertificateController(IWebHostEnvironment env)
+        private readonly IImageService _imageService;
+
+        private readonly string _wwwrootPath;
+
+        public CertificateController(IWebHostEnvironment env, IImageService imageService)
         {
-            _env = env;
+            _wwwrootPath = env.WebRootPath;
+
+            _imageService = imageService;
         }
 
         [HttpPost]
@@ -113,13 +118,11 @@ namespace FitFriends.Api.Controllers
                 return Forbid("You cannot delete this certificate.");
             }
 
-            string wwwrootPath = _env.WebRootPath;
-
             await imageService.RemoveImageAndDirectoryAsync(
                 "Certificates",
                 certificate.ImageId,
                 user.UserId,
-                wwwrootPath);
+                _wwwrootPath);
 
             await certificateService.DeleteAsync(certificateId);
 
@@ -139,54 +142,17 @@ namespace FitFriends.Api.Controllers
                 return NotFound("Certificate not found");
             }
 
-            return await UploadImageAsync(
+            ImageEntity imageEntity = await _imageService.UploadImageAsync(
                 certificateId,
                 imageFile,
                 "Certificates",
+                _wwwrootPath,
                 certificateService.UpdateCertificateWithNewImageAsync);
-        }
 
-        private async Task<IActionResult> UploadImageAsync(
-            Guid Id,
-            IFormFile imageFile,
-            string subDirName,
-            Func<Guid, ImageEntity, string, Task> updateOperation)
-        {
-            if (imageFile is null)
+            if (imageEntity is null)
             {
-                return BadRequest($"The {nameof(ImageEntity)} file field is required.");
+                return Problem();
             }
-
-            string wwwrootPath = _env.WebRootPath;
-            string subDirPath = $"{nameof(ImageEntity)}{Id}";
-
-            DirectoryInfo directoryInfo = new(Path.Combine(wwwrootPath, subDirName));
-
-            if (!directoryInfo.Exists)
-            {
-                directoryInfo.Create();
-            }
-
-            directoryInfo.CreateSubdirectory(subDirPath);
-
-            string fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-            string extension = Path.GetExtension(imageFile.FileName);
-            string imageTitle = $"{fileName}{Id}{extension}";
-
-            string path = Path.Combine(wwwrootPath, subDirName, subDirPath, imageTitle);
-
-            using (FileStream fileStream = new(path, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
-
-            ImageEntity imageEntity = new()
-            {
-                ImageFile = imageFile,
-                ImageTitle = imageTitle
-            };
-
-            await updateOperation(Id, imageEntity, wwwrootPath);
 
             return Ok(imageEntity);
         }
