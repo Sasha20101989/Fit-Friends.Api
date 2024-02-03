@@ -12,6 +12,8 @@ namespace FitFriends.ServiceLibrary.Domains.Contracts
 
         Task InsertAsync(CertificateEntity entity);
 
-        Task<CertificateEntity?> UpdateAsync(CertificateEntity entity);
+        Task<CertificateEntity?> UpdateCertificateAsync(CertificateEntity entity);
+
+        Task<CertificateEntity?> UpdateCertificateWithNewImageAsync(Guid certificateId, ImageEntity imageEntity, string wwwrootPath);
     }
 }

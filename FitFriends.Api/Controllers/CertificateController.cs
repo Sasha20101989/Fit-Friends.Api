@@ -26,7 +26,7 @@ namespace FitFriends.Api.Controllers
         {
             certificate.CertificateId = Guid.NewGuid();
 
-            UserEntity user = await userService.GetByIdAsync(certificate.UserId);
+            UserEntity? user = await userService.GetByIdAsync(certificate.UserId);
 
             if (user is null)
             {
@@ -83,7 +83,7 @@ namespace FitFriends.Api.Controllers
                 return Unauthorized("You are not authorized to update this certificate.");
             }
 
-            CertificateEntity? result = await certificateService.UpdateAsync(certificate);
+            CertificateEntity? result = await certificateService.UpdateCertificateAsync(certificate);
 
             return Ok(result);
         }
@@ -106,17 +106,20 @@ namespace FitFriends.Api.Controllers
                 return NotFound("Certificate not found");
             }
 
-            UserEntity user = await userService.GetByIdAsync(certificate.UserId);
+            UserEntity? user = await userService.GetByIdAsync(certificate.UserId);
 
             if (user is null)
             {
                 return Forbid("You cannot delete this certificate.");
             }
 
-            if (certificate.ImageId is not null)
-            {
-                await imageService.RemoveAsync((Guid)certificate.ImageId);
-            }
+            string wwwrootPath = _env.WebRootPath;
+
+            await imageService.RemoveImageAndDirectoryAsync(
+                "Certificates",
+                certificate.ImageId,
+                user.UserId,
+                wwwrootPath);
 
             await certificateService.DeleteAsync(certificateId);
 
@@ -124,30 +127,42 @@ namespace FitFriends.Api.Controllers
         }
 
         [HttpPost("{certificateId}/image")]
-        public async Task<IActionResult> UploadImageAsync(
+        public async Task<IActionResult> UploadPageImageAsync(
             Guid certificateId,
             [FromForm] IFormFile imageFile,
             [FromServices] ICertificateService certificateService)
         {
-            CertificateEntity? certificate = await certificateService.GetByIdAsync(certificateId);
+            CertificateEntity? certificateEntity = await certificateService.GetByIdAsync(certificateId);
 
-            if (certificate is null)
+            if (certificateEntity is null)
             {
                 return NotFound("Certificate not found");
             }
 
+            return await UploadImageAsync(
+                certificateId,
+                imageFile,
+                "Certificates",
+                certificateService.UpdateCertificateWithNewImageAsync);
+        }
+
+        private async Task<IActionResult> UploadImageAsync(
+            Guid Id,
+            IFormFile imageFile,
+            string subDirName,
+            Func<Guid, ImageEntity, string, Task> updateOperation)
+        {
             if (imageFile is null)
             {
-                return BadRequest("The image file field is required.");
+                return BadRequest($"The {nameof(ImageEntity)} file field is required.");
             }
 
             string wwwrootPath = _env.WebRootPath;
+            string subDirPath = $"{nameof(ImageEntity)}{Id}";
 
-            string subDirPath = $"Certificate{certificateId}";
+            DirectoryInfo directoryInfo = new(Path.Combine(wwwrootPath, subDirName));
 
-            DirectoryInfo directoryInfo = new(Path.Combine(wwwrootPath, "Certificates"));
-
-            if (directoryInfo.Exists)
+            if (!directoryInfo.Exists)
             {
                 directoryInfo.Create();
             }
@@ -155,25 +170,25 @@ namespace FitFriends.Api.Controllers
             directoryInfo.CreateSubdirectory(subDirPath);
 
             string fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
-
             string extension = Path.GetExtension(imageFile.FileName);
+            string imageTitle = $"{fileName}{Id}{extension}";
 
-            certificate.Image = new()
-            {
-                ImageFile = imageFile,
-                ImageTitle = $"{fileName}{certificateId}{extension}"
-            };
-
-            string path = Path.Combine(wwwrootPath, "Certificates", subDirPath, certificate.Image.ImageTitle);
+            string path = Path.Combine(wwwrootPath, subDirName, subDirPath, imageTitle);
 
             using (FileStream fileStream = new(path, FileMode.Create))
             {
-                await certificate.Image.ImageFile.CopyToAsync(fileStream);
+                await imageFile.CopyToAsync(fileStream);
             }
 
-            await certificateService.UpdateAsync(certificate);
+            ImageEntity imageEntity = new()
+            {
+                ImageFile = imageFile,
+                ImageTitle = imageTitle
+            };
 
-            return Ok($"Image uploaded for cetificate id {certificateId}");
+            await updateOperation(Id, imageEntity, wwwrootPath);
+
+            return Ok(imageEntity);
         }
     }
 }

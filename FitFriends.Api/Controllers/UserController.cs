@@ -5,6 +5,7 @@ using OfficeOpenXml;
 using FitFriends.ServiceLibrary.Clients.Contracts;
 using FitFriends.ServiceLibrary.QueryParameters;
 using FitFriends.ServiceLibrary.QueryFilters.MoySklad;
+using FitFriends.ServiceLibrary.Domains;
 
 namespace FitFriends.Api.Controllers
 {
@@ -12,6 +13,17 @@ namespace FitFriends.Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly IWebHostEnvironment _env;
+
+        private readonly IImageService _imageService;
+
+        public UserController(IWebHostEnvironment env, IImageService imageService)
+        {
+            _env = env;
+
+            _imageService = imageService;
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostAsync(
             [FromBody]UserEntity user,
@@ -60,7 +72,8 @@ namespace FitFriends.Api.Controllers
             [FromBody] UserEntity user, 
             [FromServices] IUserService userService)
         {
-            UserEntity result = await userService.UpdateAsync(user);
+            UserEntity? result = await userService.UpdateUserAsync(user);
+
             return Ok(result);
         }
 
@@ -68,14 +81,30 @@ namespace FitFriends.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
-        public async Task<IActionResult> DeleteAsync(Guid userId, [FromServices] IUserService userService)
+        public async Task<IActionResult> DeleteAsync(
+            Guid userId, 
+            [FromServices] IUserService userService)
         {
-            UserEntity user = await userService.GetByIdAsync(userId);
+            UserEntity? user = await userService.GetByIdAsync(userId);
 
             if (user is null)
             {
                 return NotFound("User not found");
             }
+
+            string wwwrootPath = _env.WebRootPath;
+
+            await _imageService.RemoveImageAndDirectoryAsync(
+                "Avatars", 
+                user.AvatarId, 
+                user.UserId, 
+                wwwrootPath);
+
+            await _imageService.RemoveImageAndDirectoryAsync(
+                "PageImages", 
+                user.PageImageId, 
+                user.UserId, 
+                wwwrootPath);
 
             await userService.DeleteAsync(userId);
 
@@ -123,6 +152,91 @@ namespace FitFriends.Api.Controllers
             var assortmentResponse = await moyskladService.GetFilteredAssortmentsAsync(pagination, filters);
 
             return Ok(assortmentResponse.Payload);
+        }
+
+        [HttpPost("{userId}/avatar")]
+        public async Task<IActionResult> UploadAvatarAsync(
+           Guid userId,
+           [FromForm] IFormFile avatarFile,
+           [FromServices] IUserService userService)
+        {
+            UserEntity? user = await userService.GetByIdAsync(userId);
+
+            if (user is null)
+            {
+                return NotFound("User not found");
+            }
+
+            return await UploadImageAsync(
+                userId, 
+                avatarFile, 
+                "Avatars",
+                userService.UpdateUserWithNewAvatarAsync);
+        }
+
+        [HttpPost("{userId}/pageImage")]
+        public async Task<IActionResult> UploadPageImageAsync(
+            Guid userId,
+            [FromForm] IFormFile pageImageFile,
+            [FromServices] IUserService userService)
+        {
+            UserEntity? user = await userService.GetByIdAsync(userId);
+
+            if (user is null)
+            {
+                return NotFound("User not found");
+            }
+
+            return await UploadImageAsync(
+                userId, 
+                pageImageFile, 
+                "PageImages",
+                userService.UpdateUserWithNewPageImageAsync);
+        }
+
+        private async Task<IActionResult> UploadImageAsync(
+            Guid id,
+            IFormFile imageFile,
+            string subDirName,
+            Func<Guid, ImageEntity, string, Task> updateOperation)
+        {
+            if (imageFile is null)
+            {
+                return BadRequest($"The {nameof(ImageEntity)} file field is required.");
+            }
+
+            string wwwrootPath = _env.WebRootPath;
+            string subDirPath = $"{nameof(ImageEntity)}{id}";
+
+            DirectoryInfo directoryInfo = new(Path.Combine(wwwrootPath, subDirName));
+
+            if (!directoryInfo.Exists)
+            {
+                directoryInfo.Create();
+            }
+
+            directoryInfo.CreateSubdirectory(subDirPath);
+
+            string fileName = Path.GetFileNameWithoutExtension(imageFile.FileName);
+            string extension = Path.GetExtension(imageFile.FileName);
+            string imageTitle = $"{fileName}{id}{extension}";
+
+            string path = Path.Combine(wwwrootPath, subDirName, subDirPath, imageTitle);
+
+            using (FileStream fileStream = new(path, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            ImageEntity imageEntity = new()
+            {
+                ImageFile = imageFile,
+                ImageTitle = imageTitle
+            };
+
+            await updateOperation(id, imageEntity, wwwrootPath);
+
+            return Ok(imageEntity);
         }
     }
 }

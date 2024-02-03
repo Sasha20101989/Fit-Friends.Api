@@ -35,7 +35,7 @@ namespace FitFriends.ServiceLibrary.Domains
             {
                 if (certificateEntity.ImageId is not null)
                 {
-                    certificateEntity.Image = await _imageService.GetByIdAsync((Guid)certificateEntity.ImageId);
+                    certificateEntity.CertificateImage = await _imageService.GetByIdAsync((Guid)certificateEntity.ImageId);
                 }
             }
 
@@ -47,31 +47,57 @@ namespace FitFriends.ServiceLibrary.Domains
             await _certificateRepository.InsertAsync(entity);
         }
 
-        public async Task<CertificateEntity?> UpdateAsync(CertificateEntity entity)
+        public async Task<CertificateEntity?> UpdateCertificateAsync(CertificateEntity entity)
         {
-            Guid? oldImageId = entity.ImageId;
+            return await _certificateRepository.UpdateAsync(entity);
+        }
 
-            await _imageService.CreateAsync(entity.Image);
+        public async Task<CertificateEntity?> UpdateCertificateWithNewImageAsync(Guid certificateId, ImageEntity imageEntity, string wwwrootPath)
+        {
+            CertificateEntity? certificateEntity = await GetByIdAsync(certificateId);
 
-            ImageEntity imageEntity = await _imageService.GetByIdAsync(entity.Image.Id);
-
-            if (imageEntity is not null)
-            {
-                entity.ImageId = imageEntity.Id;
-
-                CertificateEntity updatedCertificate = await _certificateRepository.UpdateAsync(entity);
-
-                if (oldImageId is not null)
-                {
-                    await _imageService.RemoveAsync((Guid)oldImageId);
-                }
-
-                return updatedCertificate;
-            }
-            else
+            if (certificateEntity is null)
             {
                 return null;
             }
+
+            Guid? oldImageId = certificateEntity.ImageId;
+            string? oldCertificateImageTitle = certificateEntity.CertificateImage?.ImageTitle;
+
+            certificateEntity.CertificateImage = imageEntity;
+
+            ImageEntity? updatedImageEntity = await UpdateImageAsync(certificateEntity.CertificateImage);
+
+            if (updatedImageEntity is not null)
+            {
+                certificateEntity.ImageId = updatedImageEntity.Id;
+
+                CertificateEntity? updatedCertificate = await UpdateCertificateAsync(certificateEntity);
+
+                if (updatedCertificate is not null)
+                {
+                    if (oldImageId is not null)
+                    {
+                        if (oldCertificateImageTitle != certificateEntity.CertificateImage.ImageTitle)
+                        {
+                            _imageService.RemoveImageFromDirectory("Certificates", (Guid)oldImageId, oldCertificateImageTitle, updatedCertificate.CertificateId, wwwrootPath);
+                        }
+
+                        await _imageService.RemoveImageFromDbAsync(oldImageId);
+                    }
+
+                    return updatedCertificate;
+                }           
+            }
+
+            return null;
+        }
+
+        private async Task<ImageEntity?> UpdateImageAsync(ImageEntity imageEntity)
+        {
+            await _imageService.CreateAsync(imageEntity);
+
+            return await _imageService.GetByIdAsync(imageEntity.Id);
         }
     }
 }

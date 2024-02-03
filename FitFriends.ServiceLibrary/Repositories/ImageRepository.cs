@@ -38,7 +38,7 @@ namespace FitFriends.ServiceLibrary.Repositories
                new { Id = imageId }
             );
 
-            return result.First();
+            return result.FirstOrDefault();
         }
 
         public async Task RemoveAsync(Guid imageId)

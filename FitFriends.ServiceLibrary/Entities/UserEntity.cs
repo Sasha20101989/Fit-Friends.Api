@@ -17,6 +17,16 @@ namespace FitFriends.ServiceLibrary.Entities
         public Guid UserId { get; set; }
 
         /// <summary>
+        /// Уникальный идентификатор аватара пользователя.
+        /// </summary>
+        public Guid? AvatarId { get; set; }
+
+        /// <summary>
+        /// Уникальный идентификатор картинки страницы пользователя.
+        /// </summary>
+        public Guid PageImageId { get; set; }
+
+        /// <summary>
         /// Имя пользователя.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
@@ -34,7 +44,7 @@ namespace FitFriends.ServiceLibrary.Entities
         /// <summary>
         /// Аватар пользователя.
         /// </summary>
-        public ImageEntity? Avatar { get; set; }
+        public virtual ImageEntity? Avatar { get; set; }
 
         /// <summary>
         /// Пароль пользователя.
@@ -74,9 +84,8 @@ namespace FitFriends.ServiceLibrary.Entities
         /// <summary>
         /// Изображение для страницы пользователя.
         /// </summary>
-        [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
-        [ImageValidation(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "InvalidImageErrorMessage")]
-        public ImageEntity ImageForPage { get; set; }
+        //[Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
+        public virtual ImageEntity? PageImage { get; set; }
 
         /// <summary>
         /// Дата создания пользователя.

@@ -1,7 +1,5 @@
-﻿using FitFriends.ServiceLibrary.Attributes;
-using FitFriends.ServiceLibrary.Properties;
+﻿using FitFriends.ServiceLibrary.Properties;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FitFriends.ServiceLibrary.Entities
 {
@@ -35,6 +33,6 @@ namespace FitFriends.ServiceLibrary.Entities
         /// <summary>
         /// Изображение сертификата.
         /// </summary>
-        public virtual ImageEntity? Image { get; set; }
+        public virtual ImageEntity? CertificateImage { get; set; }
     }
 }
