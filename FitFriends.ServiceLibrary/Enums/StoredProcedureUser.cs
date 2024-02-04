@@ -35,5 +35,10 @@ namespace FitFriends.ServiceLibrary.Enums
         /// </summary>
         [Description("Update_User")]
         UpdateUser,
+        /// <summary>
+        /// Получение пользователя по электонной почте.
+        /// </summary>
+        [Description("Get_User_By_Email")]
+        GetUserByEmail,
     }
 }

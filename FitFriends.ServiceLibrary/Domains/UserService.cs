@@ -23,6 +23,11 @@ namespace FitFriends.ServiceLibrary.Domains
             await _userRepository.DeleteAsync(userId);
         }
 
+        public async Task<UserEntity?> FindByEmailAsync(string email)
+        {
+            return await _userRepository.GetByEmailAsync(email);
+        }
+
         public async Task<IEnumerable<UserEntity>> GetAllAsync(PaginationParameters? pagination)
         {
             if (pagination is null)

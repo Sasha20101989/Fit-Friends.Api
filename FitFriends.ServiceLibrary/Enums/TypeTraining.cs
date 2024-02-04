@@ -41,6 +41,11 @@ namespace FitFriends.ServiceLibrary.Enums
         /// пилатес
         /// </summary>
         [Display(Name = "Pilates")]
-        Pilates
+        Pilates,
+        /// <summary>
+        /// силовые
+        /// </summary>
+        [Display(Name = "Power")]
+        Power
     }
 }

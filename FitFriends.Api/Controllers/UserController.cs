@@ -29,6 +29,21 @@ namespace FitFriends.Api.Controllers
             _imageService = imageService;
         }
 
+        [HttpGet("/login")]
+        public async Task<IActionResult> LoginAsync(
+            [FromHeader] string email,
+            [FromServices] IUserService userService)
+        {
+            UserEntity? foundedUser = await userService.FindByEmailAsync(email);
+
+            if (foundedUser is null)
+            {
+                return Unauthorized();
+            }
+
+            return Ok(foundedUser);
+        }
+
         [HttpPost]
         public async Task<IActionResult> PostAsync(
             [FromBody]UserEntity user,

@@ -43,7 +43,18 @@ namespace FitFriends.ServiceLibrary.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<UserEntity> GetByIdAsync(Guid userId)
+        public async Task<UserEntity?> GetByEmailAsync(string email)
+        {
+            IEnumerable<UserEntity> result = await _sqlDataAccess.LoadData<UserEntity>(
+                StoredProcedureUser.GetUserByEmail,
+                new { Email = email }
+              );
+
+            return result.FirstOrDefault();
+        }
+
+        /// <inheritdoc />
+        public async Task<UserEntity?> GetByIdAsync(Guid userId)
         {
             IEnumerable<UserEntity> result = await _sqlDataAccess.LoadData<UserEntity>(
                 StoredProcedureUser.GetUserById,
@@ -65,7 +76,7 @@ namespace FitFriends.ServiceLibrary.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<UserEntity> UpdateAsync(UserEntity entity)
+        public async Task<UserEntity?> UpdateAsync(UserEntity entity)
         {
            UpdateUserRequest request = new(entity);
 

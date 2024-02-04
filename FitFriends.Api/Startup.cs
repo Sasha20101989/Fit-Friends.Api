@@ -12,6 +12,7 @@ namespace FitFriends.Api
 {
     public class Startup(IConfiguration configuration)
     {
+        private string _myAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public IConfiguration Configuration { get; } = configuration;
 
         public void ConfigureServices(IServiceCollection services)
@@ -40,6 +41,15 @@ namespace FitFriends.Api
             services.Configure<AppConfig>(Configuration);
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: _myAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("http://localhost:3333");
+                                  });
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -66,6 +76,9 @@ namespace FitFriends.Api
 
                 endpoints.MapFallbackToFile("/index.html");
             });
+
+            app.UseCors(_myAllowSpecificOrigins);
+
         }
     }
 }

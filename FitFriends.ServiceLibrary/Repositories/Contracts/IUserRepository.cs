@@ -23,11 +23,18 @@ namespace FitFriends.ServiceLibrary.Repositories.Contracts
         Task<IEnumerable<UserEntity>> GetAllAsync(int pageSize, int offset);
 
         /// <summary>
+        /// Получить пользователя по электронной почте
+        /// </summary>
+        /// <param name="email">Электронная почта</param>
+        /// <returns>Задача, представляющая асинхронную операцию получения пользователя по электронной почте.</returns>
+        Task<UserEntity?> GetByEmailAsync(string email);
+
+        /// <summary>
         /// Получить пользователя по идентификатору.
         /// </summary>
         /// <param name="userId">Идентификатор пользователя.</param>
         /// <returns>Задача, представляющая асинхронную операцию получения пользователя.</returns>
-        Task<UserEntity> GetByIdAsync(Guid userId);
+        Task<UserEntity?> GetByIdAsync(Guid userId);
 
         /// <summary>
         /// Вставить нового пользователя.
@@ -41,6 +48,6 @@ namespace FitFriends.ServiceLibrary.Repositories.Contracts
         /// </summary>
         /// <param name="entity">Экземпляр сущности пользователя.</param>
         /// <returns>Задача, представляющая асинхронную операцию обновления и возвращения обновлённого пользователя.</returns>
-        Task<UserEntity> UpdateAsync(UserEntity entity);
+        Task<UserEntity?> UpdateAsync(UserEntity entity);
     }
 }

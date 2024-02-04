@@ -26,13 +26,13 @@ namespace FitFriends.ServiceLibrary.Entities
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
         [Range(1000, 5000, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RangeErrorMessage")]
-        public int UserCaloriesToLose { get; set; }
+        public int CaloriesToLose { get; set; }
 
         /// <summary>
         /// Количество калорий, которые пользователь должен сжигать ежедневно.
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RequiredErrorMessage")]
         [Range(1000, 5000, ErrorMessageResourceType = typeof(ValidationMessages), ErrorMessageResourceName = "RangeErrorMessage")]
-        public int UserDailyCaloriesToBurn { get; set; }
+        public int DailyCaloriesToBurn { get; set; }
     }
 }

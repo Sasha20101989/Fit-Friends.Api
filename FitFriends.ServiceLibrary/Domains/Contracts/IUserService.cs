@@ -19,6 +19,8 @@ namespace FitFriends.ServiceLibrary.Domains.Contracts
 
         Task DeleteAsync(Guid userId);
 
+        Task<UserEntity?> FindByEmailAsync(string email);
+
 
         //TODO: Реализовать универсальный дженерик для загрузки изображения
         //Task<UserEntity?> UpdateUserWithNewImageAsync(
