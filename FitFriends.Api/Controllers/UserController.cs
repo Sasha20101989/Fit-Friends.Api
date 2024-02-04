@@ -5,7 +5,7 @@ using OfficeOpenXml;
 using FitFriends.ServiceLibrary.Clients.Contracts;
 using FitFriends.ServiceLibrary.QueryParameters;
 using FitFriends.ServiceLibrary.QueryFilters.MoySklad;
-using FitFriends.ServiceLibrary.Domains;
+using FitFriends.ServiceLibrary.Enums;
 
 namespace FitFriends.Api.Controllers
 {
@@ -16,6 +16,11 @@ namespace FitFriends.Api.Controllers
         private readonly IImageService _imageService;
 
         private readonly string _wwwrootPath;
+
+        private readonly string _subDirectoryAvatars = SubDirectory.Avatars.ToString();
+
+        private readonly string _subDirectoryPageImages = SubDirectory.PageImages.ToString();
+
 
         public UserController(IWebHostEnvironment env, IImageService imageService)
         {
@@ -98,13 +103,13 @@ namespace FitFriends.Api.Controllers
             }
 
             await _imageService.RemoveImageAndDirectoryAsync(
-                "Avatars", 
+                _subDirectoryAvatars, 
                 user.AvatarId, 
                 user.UserId,
                 _wwwrootPath);
 
             await _imageService.RemoveImageAndDirectoryAsync(
-                "PageImages", 
+                _subDirectoryPageImages, 
                 user.PageImageId, 
                 user.UserId,
                 _wwwrootPath);
@@ -177,8 +182,8 @@ namespace FitFriends.Api.Controllers
 
             ImageEntity imageEntity = await _imageService.UploadImageAsync(
                 userId, 
-                avatarFile, 
-                "Avatars",
+                avatarFile,
+                _subDirectoryAvatars,
                 _wwwrootPath,
                 userService.UpdateUserWithNewAvatarAsync);
 
@@ -211,7 +216,7 @@ namespace FitFriends.Api.Controllers
             ImageEntity imageEntity = await _imageService.UploadImageAsync(
                 userId,
                 pageImageFile,
-                "PageImages",
+                _subDirectoryPageImages,
                 _wwwrootPath,
                 userService.UpdateUserWithNewPageImageAsync);
 

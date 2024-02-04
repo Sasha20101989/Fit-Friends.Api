@@ -11,12 +11,22 @@ namespace FitFriends.ServiceLibrary.Domains.Contracts
 
         Task InsertAsync(UserEntity userEntity);
 
-        Task<UserEntity?> UpdateUserWithNewAvatarAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath);
+        Task<UserEntity?> UpdateUserWithNewAvatarAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath, string subDirectory);
 
-        Task<UserEntity?> UpdateUserWithNewPageImageAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath);
+        Task<UserEntity?> UpdateUserWithNewPageImageAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath, string subDirectory);
 
         Task<UserEntity?> UpdateUserAsync(UserEntity entity);
 
         Task DeleteAsync(Guid userId);
+
+
+        //TODO: Реализовать универсальный дженерик для загрузки изображения
+        //Task<UserEntity?> UpdateUserWithNewImageAsync(
+        //    Guid userId,
+        //    ImageEntity imageEntity,
+        //    string wwwrootPath,
+        //    Func<UserEntity, ImageEntity?> getImage,
+        //    Action<UserEntity, ImageEntity> setImage,
+        //    Func<UserEntity, Task<UserEntity?>> updateUser);
     }
 }

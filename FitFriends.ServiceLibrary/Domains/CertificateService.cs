@@ -52,7 +52,7 @@ namespace FitFriends.ServiceLibrary.Domains
             return await _certificateRepository.UpdateAsync(entity);
         }
 
-        public async Task<CertificateEntity?> UpdateCertificateWithNewImageAsync(Guid certificateId, ImageEntity imageEntity, string wwwrootPath)
+        public async Task<CertificateEntity?> UpdateCertificateWithNewImageAsync(Guid certificateId, ImageEntity imageEntity, string wwwrootPath, string subDirectory)
         {
             CertificateEntity? certificateEntity = await GetByIdAsync(certificateId);
 
@@ -80,7 +80,7 @@ namespace FitFriends.ServiceLibrary.Domains
                     {
                         if (oldCertificateImageTitle != certificateEntity.CertificateImage.ImageTitle)
                         {
-                            _imageService.RemoveImageFromDirectory("Certificates", (Guid)oldImageId, oldCertificateImageTitle, updatedCertificate.CertificateId, wwwrootPath);
+                            _imageService.RemoveImageFromDirectory(subDirectory, (Guid)oldImageId, oldCertificateImageTitle, updatedCertificate.CertificateId, wwwrootPath);
                         }
 
                         await _imageService.RemoveImageFromDbAsync(oldImageId);

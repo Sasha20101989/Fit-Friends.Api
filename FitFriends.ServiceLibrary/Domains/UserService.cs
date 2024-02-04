@@ -66,7 +66,7 @@ namespace FitFriends.ServiceLibrary.Domains
             return await _userRepository.UpdateAsync(entity);
         }
 
-        public async Task<UserEntity?> UpdateUserWithNewAvatarAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath)
+        public async Task<UserEntity?> UpdateUserWithNewAvatarAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath, string subDirectory)
         {
             UserEntity? userEntity = await GetByIdAsync(userId);
 
@@ -76,6 +76,7 @@ namespace FitFriends.ServiceLibrary.Domains
             }
 
             Guid? oldAvatarImageId = userEntity.AvatarId;
+
             string? oldAvatarImageTitle = userEntity.Avatar?.ImageTitle;
 
             userEntity.Avatar = imageEntity;
@@ -94,7 +95,7 @@ namespace FitFriends.ServiceLibrary.Domains
                     {
                         if (oldAvatarImageTitle != userEntity.Avatar.ImageTitle)
                         {
-                            _imageService.RemoveImageFromDirectory("Avatars", (Guid)oldAvatarImageId, oldAvatarImageTitle, updatedUser.UserId, wwwrootPath);
+                            _imageService.RemoveImageFromDirectory(subDirectory, (Guid)oldAvatarImageId, oldAvatarImageTitle, updatedUser.UserId, wwwrootPath);
                         }
 
                         await _imageService.RemoveImageFromDbAsync(oldAvatarImageId);
@@ -107,7 +108,7 @@ namespace FitFriends.ServiceLibrary.Domains
             return null;
         }
 
-        public async Task<UserEntity?> UpdateUserWithNewPageImageAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath)
+        public async Task<UserEntity?> UpdateUserWithNewPageImageAsync(Guid userId, ImageEntity imageEntity, string wwwrootPath, string subDirectory)
         {
             UserEntity? userEntity = await GetByIdAsync(userId);
 
@@ -135,7 +136,7 @@ namespace FitFriends.ServiceLibrary.Domains
                     {
                         if (oldPageImageTitle != userEntity.PageImage.ImageTitle)
                         {
-                            _imageService.RemoveImageFromDirectory("PageImages", oldPageImageId, oldPageImageTitle, updatedUser.UserId, wwwrootPath);
+                            _imageService.RemoveImageFromDirectory(subDirectory, oldPageImageId, oldPageImageTitle, updatedUser.UserId, wwwrootPath);
                         }
 
                         await _imageService.RemoveImageFromDbAsync(oldPageImageId);

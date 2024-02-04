@@ -1,6 +1,7 @@
 ﻿using FitFriends.ServiceLibrary.Domains;
 using FitFriends.ServiceLibrary.Domains.Contracts;
 using FitFriends.ServiceLibrary.Entities;
+using FitFriends.ServiceLibrary.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FitFriends.Api.Controllers
@@ -12,6 +13,8 @@ namespace FitFriends.Api.Controllers
         private readonly IImageService _imageService;
 
         private readonly string _wwwrootPath;
+
+        private readonly string _subDirectoryCertificates = SubDirectory.Certificates.ToString();
 
         public CertificateController(IWebHostEnvironment env, IImageService imageService)
         {
@@ -67,7 +70,7 @@ namespace FitFriends.Api.Controllers
             [FromServices] ICertificateService certificateService)
         {
 
-            var certificates = await certificateService.GetAllByUserAsync(userId);
+            IEnumerable<CertificateEntity> certificates = await certificateService.GetAllByUserAsync(userId);
 
             return Ok(certificates);
         }
@@ -81,7 +84,7 @@ namespace FitFriends.Api.Controllers
             [FromServices] IUserService userService,
             [FromServices] ICertificateService certificateService)
         {
-            UserEntity user = await userService.GetByIdAsync(certificate.UserId);
+            UserEntity? user = await userService.GetByIdAsync(certificate.UserId);
 
             if (user is null)
             {
@@ -119,7 +122,7 @@ namespace FitFriends.Api.Controllers
             }
 
             await imageService.RemoveImageAndDirectoryAsync(
-                "Certificates",
+                _subDirectoryCertificates,
                 certificate.ImageId,
                 user.UserId,
                 _wwwrootPath);
@@ -145,7 +148,7 @@ namespace FitFriends.Api.Controllers
             ImageEntity imageEntity = await _imageService.UploadImageAsync(
                 certificateId,
                 imageFile,
-                "Certificates",
+                _subDirectoryCertificates,
                 _wwwrootPath,
                 certificateService.UpdateCertificateWithNewImageAsync);
 

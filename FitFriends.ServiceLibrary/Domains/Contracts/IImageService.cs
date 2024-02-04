@@ -16,7 +16,7 @@ namespace FitFriends.ServiceLibrary.Domains.Contracts
             IFormFile imageFile,
             string subDirName,
             string wwwrootPath,
-        Func<Guid, ImageEntity, string, Task> updateOperation);
+        Func<Guid, ImageEntity, string, string, Task> updateOperation);
 
         Task RemoveImageFromDbAsync(Guid? imageId);
 

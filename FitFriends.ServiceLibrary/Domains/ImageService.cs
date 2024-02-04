@@ -76,7 +76,7 @@ namespace FitFriends.ServiceLibrary.Domains
             IFormFile imageFile,
             string subDirName,
             string wwwrootPath,
-            Func<Guid, ImageEntity, string, Task> updateOperation)
+            Func<Guid, ImageEntity, string, string, Task> updateOperation)
         {
             string subDirPath = $"{nameof(ImageEntity)}{id}";
 
@@ -106,7 +106,7 @@ namespace FitFriends.ServiceLibrary.Domains
                 ImageTitle = imageTitle
             };
 
-            await updateOperation(id, imageEntity, wwwrootPath);
+            await updateOperation(id, imageEntity, wwwrootPath, subDirName);
 
             return imageEntity;
         }
